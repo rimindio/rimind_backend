@@ -1,0 +1,10 @@
+module default {
+    type User {
+        required wallet: str;
+    }
+
+    type Challenge {
+        required expires_at: datetime;
+        required nonce: str;
+    }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "rimind-backend",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@elysiajs/eden": "^1.2.0",
+    "@types/bun": "latest",
+    "bs58": "^6.0.0",
+    "supabase": "^2.22.6",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.1.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "^1.2.0",
+    "@elysiajs/jwt": "^1.2.0",
+    "@solana/kit": "^2.1.0",
+    "elysia": "^1.2.25",
+    "gel": "^2.1.0",
+    "logixlysia": "^4.2.7"
+  }
+}

@@ -1,0 +1,7 @@
+watch = []
+
+[instance]
+server-version = "6.5"
+
+[hooks]
+schema.update.after = "bun x @gel/generate edgeql-js"
