@@ -1,10 +1,30 @@
 module default {
     type User {
         required wallet: str;
+        multi conversations := .<owner[is Conversation];
     }
 
     type Challenge {
         required expires_at: datetime;
         required nonce: str;
+    }
+
+    type Conversation {
+        required created_at: datetime {
+            default := datetime_current();
+        };
+        required owner: User;
+        multi messages := .<conversation[is Message];
+    }
+
+    type Message {
+        required content: str;
+        required created_at: datetime {
+            default := datetime_current();
+        };
+        required message_type: str {
+            constraint one_of("user", "ai");
+        };
+        required conversation: Conversation;
     }
 }

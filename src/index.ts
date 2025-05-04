@@ -2,6 +2,7 @@ import cors from "@elysiajs/cors";
 import { Elysia, t } from "elysia";
 import logixlysia from "logixlysia";
 import { userController } from "./modules/user/user.controller";
+import { chatController } from "./modules/chat/chat.controller";
 
 // Configure the logging plugin for production
 const setupApp = () => {
@@ -29,6 +30,7 @@ const setupApp = () => {
 	return app
 		.use(cors())
 		.use(userController)
+		.use(chatController)
 		.get("/", () => "Hello World")
 		.get("/conversations", () => [])
 		.get("/conversation/:id", () => {})
