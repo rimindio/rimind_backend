@@ -6,7 +6,6 @@ import {
 } from "./chat.service";
 import { chatModel } from "./chat.model";
 
-// Define the user type
 type AuthUser = {
 	id: string;
 	[key: string]: any;

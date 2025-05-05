@@ -6,6 +6,7 @@
   "devDependencies": {
     "@elysiajs/eden": "^1.2.0",
     "@types/bun": "latest",
+    "@types/ws": "^8.18.1",
     "bs58": "^6.0.0",
     "supabase": "^2.22.6",
     "vite-tsconfig-paths": "^5.1.4",
@@ -19,8 +20,13 @@
     "@elysiajs/jwt": "^1.2.0",
     "@llamaindex/openai": "^0.3.5",
     "@solana/kit": "^2.1.0",
+    "@types/express": "^5.0.1",
     "elysia": "^1.2.25",
+    "express": "^5.1.0",
     "gel": "^2.1.0",
-    "logixlysia": "^4.2.7"
+    "logixlysia": "^4.2.7",
+    "socket.io": "^4.8.1",
+    "three": "^0.176.0",
+    "ws": "^8.18.2"
   }
 }

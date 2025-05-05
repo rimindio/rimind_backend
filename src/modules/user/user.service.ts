@@ -104,7 +104,7 @@ export const userService = () =>
 		.use(
 			jwt({
 				name: "jwt",
-				// biome-ignore lint/style/noNonNullAssertion: <explanation>
+				
 				secret: process.env.JWT_SECRET_KEY!,
 				alg: "HS256",
 				exp: "3d",
