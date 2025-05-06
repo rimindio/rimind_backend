@@ -13,6 +13,7 @@ import type {
   SensorDataMessage,
 } from './robotics.model';
 
+
 class SimulatedRobotConnection {
   private status: RobotStatus;
   private messageHandlers: Map<string, (payload: any) => Promise<void> | void> = new Map();
@@ -150,6 +151,21 @@ class SimulatedRobotConnection {
         this.status.task = null;
         responseMessage = 'Stopping.';
         break;
+      case 'go_to_charging_station': 
+        
+        this.status.status = 'executing';
+        this.status.task = 'Navigating to Charging Station';
+        responseMessage = 'Navigating to charging station.';
+        
+        setTimeout(() => {
+          this.status.position = { x: 0, y: 0, z: 0 }; 
+          this.status.isCharging = true;
+          this.status.status = 'idle';
+          this.status.task = 'Charging';
+          this.emitStatusUpdate();
+          this.sendSimulatedCommandResponse('success', 'Reached charging station and started charging.');
+        }, 5000); 
+        break;
       default:
         responseStatus = 'error';
         responseMessage = `Unknown command: ${commandPayload.command}`;
@@ -183,6 +199,7 @@ class SimulatedRobotConnection {
             });
             this.emitSensorData({
                 temperature: 20 + Math.random() * 5,
+                battery_voltage: 12 + Math.random() * 1, 
             });
         }, 500); 
      }
@@ -234,6 +251,7 @@ class SimulatedRobotConnection {
         temperature: 20 + Math.random() * 10,
         humidity: 30 + Math.random() * 40,
         distance: Math.random() * 5,
+        battery_voltage: 12 + Math.random() * 1, 
       });
     }, 10000); 
   }

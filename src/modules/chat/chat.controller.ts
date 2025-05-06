@@ -1,31 +1,33 @@
 import Elysia, { error, t } from "elysia";
 import {
-	chatService,
-	type ChatServiceInstance,
-	ChatService,
+	chatgptService,
+	type ChatGPTServiceInstance,
+	ChatGPTService,
 } from "./chat.service";
-import { chatModel } from "./chat.model";
+import { chatgptModel, messagesArraySchema } from "./chat.model";
 
+// Define the user type
 type AuthUser = {
 	id: string;
 	[key: string]: any;
 };
 
-export const chatController = new Elysia()
-	.use(chatModel)
-	.use(chatService)
+export const chatgptController = new Elysia()
+	.use(chatgptModel)
+	.use(chatgptService)
 	.group("/conversations", (app) =>
 		app
 			.get(
 				"/",
-				async ({ chatService, user, cookie, isLoggedIn }) => {
+				async ({ chatgptService, user, cookie, isLoggedIn }) => {
 					console.log("DEBUG: /conversations GET", {
 						cookie,
 						user,
 						isLoggedIn,
 					});
 					try {
-						return await chatService.getConversations((user as AuthUser).id);
+						// We can safely assert user is of type AuthUser when isLoggedIn is true
+						return await chatgptService.getConversations((user as AuthUser).id);
 					} catch (e) {
 						return error(500, { message: (e as Error).message });
 					}
@@ -41,14 +43,14 @@ export const chatController = new Elysia()
 			)
 			.post(
 				"/",
-				async ({ chatService, user, cookie, isLoggedIn }) => {
+				async ({ chatgptService, user, cookie, isLoggedIn }) => {
 					console.log("DEBUG: /conversations POST", {
 						cookie,
 						user,
 						isLoggedIn,
 					});
 					try {
-						return await chatService.createConversation(
+						return await chatgptService.createConversation(
 							(user as AuthUser).id,
 						);
 					} catch (e) {
@@ -72,9 +74,9 @@ export const chatController = new Elysia()
 		app
 			.get(
 				"/",
-				async ({ chatService, user, params }) => {
+				async ({ chatgptService, user, params }) => {
 					try {
-						return await chatService.getConversation(
+						return await chatgptService.getConversation(
 							params.id,
 							(user as AuthUser).id,
 						);
@@ -97,9 +99,10 @@ export const chatController = new Elysia()
 			)
 			.get(
 				"/messages",
-				async ({ chatService, user, params }) => {
+				async ({ chatgptService, user, params }) => {
+					console.log("DEBUG: GET /conversation/:id/messages handler called");
 					try {
-						const conversation = await chatService.getConversation(
+						const conversation = await chatgptService.getConversation(
 							params.id,
 							(user as AuthUser).id,
 						);
@@ -114,7 +117,7 @@ export const chatController = new Elysia()
 				{
 					isLoggedIn: true,
 					response: {
-						200: t.Array(t.Ref("chat.message")),
+						200: messagesArraySchema, // Use the imported schema directly
 						401: t.Object({ message: t.String() }),
 						404: t.Object({ message: t.String() }),
 						500: t.Object({ message: t.String() }),
@@ -124,13 +127,13 @@ export const chatController = new Elysia()
 			.post(
 				"/messages",
 				async function* ({
-					chatService,
+					chatgptService,
 					user,
 					params,
 					body,
 					set,
 				}: {
-					chatService: ChatService;
+					chatgptService: ChatGPTService;
 					user: any;
 					params: { id: string };
 					body: { content: string };
@@ -143,13 +146,13 @@ export const chatController = new Elysia()
 						const userMessageContent = body.content;
 						const userId = (user as AuthUser).id;
 
-						await chatService.addMessage(
+						await chatgptService.addMessage(
 							conversationId,
 							userId,
 							userMessageContent,
 						);
 
-						const stream = await chatService.generateAIResponseStream(
+						const stream = await chatgptService.generateAIResponseStream(
 							conversationId,
 							userId,
 							userMessageContent,
@@ -165,7 +168,7 @@ export const chatController = new Elysia()
 						}
 
 						if (fullAiResponse.trim()) {
-							await chatService.saveAIMessage(
+							await chatgptService.saveAIMessage(
 								conversationId,
 								fullAiResponse.trim(),
 							);
@@ -181,6 +184,9 @@ export const chatController = new Elysia()
 						if (e instanceof Error && e.message === "Conversation not found") {
 							statusCode = 404;
 						}
+
+						// Set the status code on the response
+						set.status = statusCode;
 
 						if (!streamStarted) {
 							yield JSON.stringify(

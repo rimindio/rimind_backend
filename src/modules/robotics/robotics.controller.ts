@@ -1,3 +1,5 @@
+
+
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { RoboticsService } from './robotics.service'; 
@@ -16,7 +18,19 @@ export class RoboticsController {
   private initializeRoutes(): void {
     this.router.get('/status', this.getStatus.bind(this));
     this.router.post('/command', this.sendCommand.bind(this));
+    this.router.post('/command/go-charge', this.sendGoChargeCommand.bind(this)); 
     this.router.get('/sensor/:robotId', this.getSensors.bind(this)); 
+  }
+
+  public sendGoChargeCommand(req: Request<any, any, { robotId: string }>, res: Response<CommandResponsePayload>): void {
+    const { robotId } = req.body;
+    if (!robotId) {
+      res.status(400).json({ status: 'error', message: 'Robot ID must be provided.' });
+      return;
+    }
+    const commandPayload = { command: 'go_to_充电站' };
+    const result = this.roboticsService.sendCommandToRobot(robotId, commandPayload);
+    res.status(result.status === 'success' ? 200 : 400).json(result);
   }
 
   public getStatus(req: Request, res: Response<RobotStatus[]>): void {

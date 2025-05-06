@@ -1,3 +1,5 @@
+
+
 import type { CompanionBotMessage } from './companion_bot.model';
 import { CompanionBotService } from './companion_bot.service';
 import { WebSocketServer, WebSocket } from 'ws';
@@ -68,4 +70,19 @@ export class CompanionBotController {
   
   
   
+
+  public simulateComplexInteractionTrigger(message: CompanionBotMessage): void {
+    console.log('Triggering simulated complex interaction.');
+    const response = this.companionBotService.simulateComplexInteraction(message);
+    this.broadcast({ type: 'dialogue', payload: response }); 
+  }
+
+  public simulateDataProcessingTrigger(data: any): void {
+    console.log('Triggering simulated data processing.');
+    const result = this.companionBotService.simulateDataProcessing(data);
+    
+    
+    console.log('Simulated data processing result:', result);
+    this.broadcast({ type: 'dialogue', payload: { text: 'Simulated data processing complete.', visualFeedback: 'neutral' } });
+  }
 }

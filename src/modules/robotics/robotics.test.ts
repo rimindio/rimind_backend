@@ -1,5 +1,7 @@
+
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { RoboticsServiceImpl } from './robotics.service';
+import { RoboticsServiceImpl } from './robotics.service'; 
 import type {
   RobotStatus,
   CommandRequestPayload,
@@ -16,45 +18,45 @@ const mockStartSimulation = vi.fn();
 vi.mock('./robotics.service', async (importOriginal) => {
   const actual = await importOriginal<any>();
 
-
+  
   const MockSimulatedRobotConnection = vi.fn((initialStatus: RobotStatus) => {
-    mockGetStatus.mockReturnValue(initialStatus);
+    mockGetStatus.mockReturnValue(initialStatus); 
     return {
       sendMessage: mockSendMessage,
       onMessage: mockOnMessage,
       getStatus: mockGetStatus,
       startSimulation: mockStartSimulation,
-
+      
     };
   });
 
   return {
     ...actual,
     RoboticsServiceImpl: vi.fn(() => ({
-
-      simulatedRobotConnections: new Map(),
-      handleRobotMessage: vi.fn(),
-      onMessage: vi.fn(),
+      
+      simulatedRobotConnections: new Map(), 
+      handleRobotMessage: vi.fn(), 
+      onMessage: vi.fn(), 
       sendCommandToRobot: vi.fn((robotId: string, commandPayload: CommandRequestPayload) => {
-
-        const connection = new MockSimulatedRobotConnection({ id: robotId } as RobotStatus);
+        
+        const connection = new MockSimulatedRobotConnection({ id: robotId } as RobotStatus); 
         connection.sendMessage({ type: 'command', timestamp: Date.now(), robotId, payload: commandPayload });
-        return { status: 'success', message: `Command "${commandPayload.command}" sent to robot ${robotId}.` };
+        return { status: 'success', message: `Command "${commandPayload.command}" sent to robot ${robotId}.` }; 
       }),
       getRobotStatus: vi.fn((robotId: string) => {
-
+        
         const connection = new MockSimulatedRobotConnection({ id: robotId } as RobotStatus);
         return connection.getStatus();
       }),
       getAllRobotStatuses: vi.fn(() => {
-
+        
         return [{ id: 'robot-1' }, { id: 'robot-2' }] as RobotStatus[];
       }),
       stopSimulations: vi.fn(),
-
+      
     })),
-
-
+    
+    
   };
 });
 
@@ -63,19 +65,19 @@ describe('RoboticsServiceImpl', () => {
   let roboticsService: RoboticsServiceImpl;
 
   beforeEach(() => {
-
+    
     vi.clearAllMocks();
-
+    
     roboticsService = new RoboticsServiceImpl();
   });
 
   it('should initialize with simulated robots', () => {
-
-
+    
+    
     expect(mockStartSimulation).toHaveBeenCalled();
-
-
-
+    
+    
+    
     const statuses = roboticsService.getAllRobotStatuses();
     expect(statuses.length).toBeGreaterThan(0);
     expect(statuses[0]).toHaveProperty('id');
@@ -87,7 +89,7 @@ describe('RoboticsServiceImpl', () => {
 
     roboticsService.sendCommandToRobot(robotId, command);
 
-
+    
     expect(mockSendMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'command',
@@ -103,8 +105,8 @@ describe('RoboticsServiceImpl', () => {
 
     roboticsService.onMessage(messageType, mockListener);
 
-
-
+    
+    
     const simulatedMessage: RobotSocketMessage<RobotStatus> = {
       type: messageType,
       timestamp: Date.now(),
@@ -112,23 +114,23 @@ describe('RoboticsServiceImpl', () => {
       payload: { id: 'robot-1', status: 'active' } as RobotStatus,
     };
 
-
-
+    
+    
     const serviceInstance = (RoboticsServiceImpl as vi.Mock).mock.instances[0];
     serviceInstance.handleRobotMessage(simulatedMessage);
 
 
-
-
-
-
-
+    
+    
+    
+    
+    
     expect(roboticsService.onMessage).toHaveBeenCalledWith(messageType, mockListener);
 
-
-
-
-
+    
+    
+    
+    
   });
 
   it('should return status for a specific robot', () => {
@@ -147,9 +149,9 @@ describe('RoboticsServiceImpl', () => {
   it('should stop simulations', () => {
     roboticsService.stopSimulations();
     expect(roboticsService.stopSimulations).toHaveBeenCalled();
-
-
+    
+    
   });
 
-
+  
 });
